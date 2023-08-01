@@ -1,0 +1,29 @@
+version: '3.8'
+
+
+services:
+  map:
+    env_file: .env
+    shm_size: $SHM_S
+    build:
+        context: ./
+        dockerfile: Dockerfile
+    image: osm-server:1.1
+    volumes:
+      - osm-database:/data/database/
+      - osm-rendered-tiles:/data/tiles/
+    ports:
+      - "80:80"
+    command: "run"
+    environment:
+      - REPLICATION_URL=https://planet.openstreetmap.org/replication/minute/
+      - UPDATES=$UPDATES
+      - MAX_INTERVAL_SECONDS=$INTERVAL
+      - THREADS=$THREADS
+      - "OSM2PGSQL_EXTRA_ARGS=-C $CACHE"
+
+volumes:
+  osm-database:
+    name: "osm-database"
+  osm-rendered-tiles:
+    name: "osm-rendered-tiles"
